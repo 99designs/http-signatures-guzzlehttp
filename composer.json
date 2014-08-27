@@ -1,7 +1,7 @@
 {
     "name": "99designs/http-signatures-guzzle",
     "description": "Sign and verify HTTP messages with Guzzle",
-    "homepage": "https://github.com/99designs/http-signatures-php",
+    "homepage": "https://github.com/99designs/http-signatures-guzzle",
     "keywords": ["http", "https", "signing", "signed", "signature", "hmac", "guzzle"],
     "license": "MIT",
     "authors": [
@@ -12,13 +12,13 @@
     ],
     "autoload": {
         "psr-4": {
-            "HttpSignatures\\": "src/"
+            "": "src/"
         }
     },
     "require": {
         "php": ">=5.3.0",
         "99designs/http-signatures": "~1.1",
-        "guzzle/guzzle": ">=3.9"
+        "guzzle/guzzle": "~3.9"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.1"

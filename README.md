@@ -12,7 +12,7 @@ This library includes support for automatically signing Guzzle requests using an
 
 ```php
 use HttpSignatures\Context;
-use HttpSignatures\Guzzle\CreateRequestSubscriber;
+use HttpSignatures\Guzzle\RequestSubscriber;
 
 $context = new Context(array(
   'keys' => array('examplekey' => 'secret-key-here'),
@@ -21,7 +21,7 @@ $context = new Context(array(
 ));
 
 $client = new \Guzzle\Http\Client('http://example.org');
-$client->addSubscriber(new CreateRequestSubscriber($context));
+$client->addSubscriber(new RequestSubscriber($context));
 
 // The below will now send a signed request to: http://example.org/path?query=123
 $client->get('/path?query=123', array(

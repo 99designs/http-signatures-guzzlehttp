@@ -2,7 +2,7 @@
 
 namespace HttpSignatures\Test;
 
-use HttpSignatures\Guzzle\CreateRequestSubscriber;
+use HttpSignatures\Guzzle\RequestSubscriber;
 use HttpSignatures\Context;
 use HttpSignatures\Guzzle\Message;
 
@@ -17,7 +17,7 @@ class GuzzleSignerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->client = new \Guzzle\Http\Client();
-        $this->client->addSubscriber(new CreateRequestSubscriber($this->context));
+        $this->client->addSubscriber(new RequestSubscriber($this->context));
     }
 
     public function testGuzzleRequestHasExpectedHeaders()

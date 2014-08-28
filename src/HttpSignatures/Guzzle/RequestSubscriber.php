@@ -5,7 +5,7 @@ namespace HttpSignatures\Guzzle;
 use Guzzle\Common\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CreateRequestSubscriber implements EventSubscriberInterface
+class RequestSubscriber implements EventSubscriberInterface
 {
     private $context;
 

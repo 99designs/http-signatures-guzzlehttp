@@ -1,18 +1,19 @@
-HTTP Signatures Guzzle 3
+HTTP Signatures Guzzle 4
 ===
 
-[![Build Status](https://travis-ci.org/99designs/http-signatures-guzzle.svg)](https://travis-ci.org/99designs/http-signatures-guzzle)
+[![Build Status](https://travis-ci.org/99designs/http-signatures-guzzlehttp.svg)](https://travis-ci.org/99designs/http-signatures-guzzlehttp)
 
-Adds Guzzle 3 support to [99designs/http-signatures][99signatures]
+Adds [99designs/http-signatures](http-signatures) support to Guzzle 4.  
+For Guzzle 3 see the [99designs/http-signatures-guzzle](99designs/http-signatures-guzzle) repo.
 
-Signing with Guzzle 3
+Signing with Guzzle 4
 ---
 
 This library includes support for automatically signing Guzzle requests using an event subscriber.
 
 ```php
 use HttpSignatures\Context;
-use HttpSignatures\Guzzle\RequestSubscriber;
+use HttpSignatures\GuzzleHttp\RequestSubscriber;
 
 $context = new Context(array(
   'keys' => array('examplekey' => 'secret-key-here'),
@@ -21,17 +22,15 @@ $context = new Context(array(
 ));
 
 $client = new \Guzzle\Http\Client('http://example.org');
-$client->addSubscriber(new RequestSubscriber($context));
+$client->getEmiter()->attach(new RequestSubscriber($context));
 
 // The below will now send a signed request to: http://example.org/path?query=123
 $client->get('/path?query=123', array(
   'Date' => 'Wed, 30 Jul 2014 16:40:19 -0700',
   'Accept' => 'llamas',
-))->send();
+));
 ```
 
 ## Contributing
 
 Pull Requests are welcome.
-
-[99signatures]: https://github.com/99designs/http-signatures-php

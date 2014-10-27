@@ -5,8 +5,8 @@ Guzzle 4 support for 99designs http-signatures library
 
 [![Build Status](https://travis-ci.org/99designs/http-signatures-guzzlehttp.svg)](https://travis-ci.org/99designs/http-signatures-guzzlehttp)
 
-Adds [99designs/http-signatures](http-signatures) support to Guzzle 4.  
-For Guzzle 3 see the [99designs/http-signatures-guzzle](99designs/http-signatures-guzzle) repo.
+Adds [99designs/http-signatures][99signatures] support to Guzzle 4.  
+For Guzzle 3 see the [99designs/http-signatures-guzzle][99signatures-guzzle] repo.
 
 Signing with Guzzle 4
 ---------------------
@@ -36,3 +36,6 @@ $client->get('/path?query=123', array(
 ## Contributing
 
 Pull Requests are welcome.
+
+[99signatures]: https://github.com/99designs/http-signatures-php
+[99signatures-guzzle]: https://github.com/99designs/http-signatures-guzzle

@@ -24,7 +24,7 @@ $context = new Context(array(
 ));
 
 $client = new \Guzzle\Http\Client('http://example.org');
-$client->getEmiter()->attach(new RequestSubscriber($context));
+$client->getEmitter()->attach(new RequestSubscriber($context));
 
 // The below will now send a signed request to: http://example.org/path?query=123
 $client->get('/path?query=123', array(

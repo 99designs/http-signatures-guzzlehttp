@@ -11,6 +11,5 @@ install: composer require --no-update guzzlehttp/guzzle $GUZZLE_VERSION; compose
 script: vendor/bin/phpunit
 
 env:
-  - GUZZLE_VERSION: 4.2
-  - GUZZLE_VERSION: 5.0
-  - GUZZLE_VERSION: 5.2
+  - GUZZLE_VERSION: 6.0
+  - GUZZLE_VERSION: 6.1

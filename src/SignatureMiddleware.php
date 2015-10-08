@@ -17,11 +17,11 @@ class SignatureMiddleware
     /**
      * Create a new signature middleware instance.
      *
-     * @param \HttpSignatures\Context $context
+     * @param array $args
      */
-    public function __construct(Context $context)
+    public function __construct(array $args)
     {
-        $this->context = $context;
+        $this->context = new Context($args);
     }
 
     /**

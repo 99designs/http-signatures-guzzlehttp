@@ -1,7 +1,8 @@
 <?php
 
-namespace HttpSignatures\Test;
+namespace HttpSignatures\GuzzleHttp\Tests;
 
+use GuzzleHttp\Client;
 use HttpSignatures\GuzzleHttp\Message;
 use HttpSignatures\GuzzleHttp\RequestSubscriber;
 use HttpSignatures\Context;
@@ -26,9 +27,10 @@ class GuzzleHttpSignerTest extends \PHPUnit_Framework_TestCase
             'headers' => array('(request-target)', 'date'),
         ));
 
-        $this->client = new \GuzzleHttp\Client([
+        $this->client = new Client([
             'auth' => 'http-signatures'
         ]);
+
         $this->client->getEmitter()->attach(new RequestSubscriber($this->context));
     }
 

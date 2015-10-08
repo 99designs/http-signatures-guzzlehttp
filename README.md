@@ -1,36 +1,40 @@
-HTTP Signatures Guzzle 4
-========================
+# HTTP Signatures Guzzle
 
-Guzzle 4 support for 99designs http-signatures library
+Guzzle support for 99designs http-signatures library.
 
 [![Build Status](https://travis-ci.org/99designs/http-signatures-guzzlehttp.svg)](https://travis-ci.org/99designs/http-signatures-guzzlehttp)
 
-Adds [99designs/http-signatures][99signatures] support to Guzzle 4.
+Adds [99designs/http-signatures][99signatures] support to Guzzle.
 For Guzzle 3 see the [99designs/http-signatures-guzzle][99signatures-guzzle] repo.
 
-Signing with Guzzle 4
----------------------
+## Signing with Guzzle
 
 This library includes support for automatically signing Guzzle requests using an event subscriber.
 
 ```php
-use HttpSignatures\Context;
-use HttpSignatures\GuzzleHttp\RequestSubscriber;
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use HttpSignatures\GuzzleHttp\SignatureMiddleware;
 
-$context = new Context(array(
-  'keys' => array('examplekey' => 'secret-key-here'),
+$stack = HandlerStack::create();
+$stack->push(new SignatureMiddleware([
+  'keys' => ['examplekey' => 'secret-key-here'],
   'algorithm' => 'hmac-sha256',
-  'headers' => array('(request-target)', 'Date', 'Accept'),
-));
+  'headers' => ['(request-target)', 'Date', 'Accept'],
+]));
 
-$client = new \Guzzle\Http\Client('http://example.org');
-$client->getEmitter()->attach(new RequestSubscriber($context));
+$client = new Client([
+  'base_uri' => 'http://example.org'
+  'handler' => $stack,
+]);
 
 // The below will now send a signed request to: http://example.org/path?query=123
-$client->get('/path?query=123', array(
-  'Date' => 'Wed, 30 Jul 2014 16:40:19 -0700',
-  'Accept' => 'llamas',
-));
+$client->get('/path?query=123', [
+  'headers' => [
+    'Date' => 'Wed, 30 Jul 2014 16:40:19 -0700',
+    'Accept' => 'llamas',
+  ],
+]);
 ```
 
 ## Contributing

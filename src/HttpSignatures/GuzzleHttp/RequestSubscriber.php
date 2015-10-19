@@ -27,11 +27,6 @@ class RequestSubscriber implements SubscriberInterface
     public function onBefore(BeforeEvent $event)
     {
         $request = $event->getRequest();
-
-        if ($request->getConfig()['auth'] != 'http-signatures') {
-            return;
-        }
-
         $this->context->signer()->sign(new Message($request));
     }
 }

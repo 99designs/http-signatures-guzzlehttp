@@ -2,6 +2,10 @@
 
 namespace HttpSignatures\Test;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Message\Response;
+use GuzzleHttp\Subscriber\History;
+use GuzzleHttp\Subscriber\Mock;
 use HttpSignatures\GuzzleHttp\Message;
 use HttpSignatures\GuzzleHttp\RequestSubscriber;
 use HttpSignatures\Context;
@@ -14,7 +18,7 @@ class GuzzleHttpSignerTest extends \PHPUnit_Framework_TestCase
     private $context;
 
     /**
-     * @var \GuzzleHttp\Client
+     * @var Client
      */
     private $client;
 
@@ -26,9 +30,17 @@ class GuzzleHttpSignerTest extends \PHPUnit_Framework_TestCase
             'headers' => array('(request-target)', 'date'),
         ));
 
-        $this->client = new \GuzzleHttp\Client([
-            'auth' => 'http-signatures'
+        $this->client = new Client();
+
+        $mock = new Mock([
+            new Response(200)
         ]);
+
+        $this->client->getEmitter()->attach($mock);
+
+        $this->history = new History();
+        $this->client->getEmitter()->attach($this->history);
+
         $this->client->getEmitter()->attach(new RequestSubscriber($this->context));
     }
 
@@ -37,11 +49,10 @@ class GuzzleHttpSignerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGuzzleRequestHasExpectedHeaders()
     {
-        $message = $this->client->createRequest('GET', '/path?query=123', array(
+        $this->client->get('/path?query=123', array(
             'headers' => array('date' => 'today', 'accept' => 'llamas')
         ));
-
-        $this->context->signer()->sign(new Message($message));
+        $message = $this->history->getLastRequest();
 
         $expectedString = implode(
             ',',
@@ -69,11 +80,10 @@ class GuzzleHttpSignerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGuzzleRequestHasExpectedHeaders2()
     {
-        $message = $this->client->createRequest('GET', '/path', array(
+        $this->client->get('/path', array(
             'headers' => array('date' => 'today', 'accept' => 'llamas')
         ));
-
-        $this->context->signer()->sign(new Message($message));
+        $message = $this->history->getLastRequest();
 
         $expectedString = implode(
             ',',
@@ -98,11 +108,10 @@ class GuzzleHttpSignerTest extends \PHPUnit_Framework_TestCase
 
     public function testVerifyGuzzleRequest()
     {
-        $message = $this->client->createRequest('GET', '/path?query=123', array(
-            'headers' => array('date' => 'today', 'accept' => 'dogs')
+        $this->client->get('/path?query=123', array(
+            'headers' => array('date' => 'today', 'accept' => 'llamas')
         ));
-
-        $this->context->signer()->sign(new Message($message));
+        $message = $this->history->getLastRequest();
 
         $this->assertTrue($this->context->verifier()->isValid(new Message($message)));
     }

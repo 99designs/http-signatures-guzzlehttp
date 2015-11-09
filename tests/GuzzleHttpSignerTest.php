@@ -3,12 +3,14 @@
 namespace HttpSignatures\Test;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Message\Response;
-use GuzzleHttp\Subscriber\History;
-use GuzzleHttp\Subscriber\Mock;
-use HttpSignatures\GuzzleHttp\Message;
-use HttpSignatures\GuzzleHttp\RequestSubscriber;
+use GuzzleHttp\Handler\CurlHandler;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use HttpSignatures\Context;
+use HttpSignatures\GuzzleHttpSignatures;
 
 class GuzzleHttpSignerTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,26 +24,26 @@ class GuzzleHttpSignerTest extends \PHPUnit_Framework_TestCase
      */
     private $client;
 
+    /**
+     * @var
+     */
+    private $history = [];
+
     public function setUp()
     {
-        $this->context = new Context(array(
-            'keys' => array('pda' => 'secret'),
+        $this->context = new Context([
+            'keys' => ['pda' => 'secret'],
             'algorithm' => 'hmac-sha256',
-            'headers' => array('(request-target)', 'date'),
-        ));
-
-        $this->client = new Client();
-
-        $mock = new Mock([
-            new Response(200)
+            'headers' => ['(request-target)', 'date'],
         ]);
 
-        $this->client->getEmitter()->attach($mock);
-
-        $this->history = new History();
-        $this->client->getEmitter()->attach($this->history);
-
-        $this->client->getEmitter()->attach(new RequestSubscriber($this->context));
+        $stack = new HandlerStack();
+        $stack->setHandler(new MockHandler([
+            new Response(200, ['Content-Length' => 0]),
+        ]));
+        $stack->push(GuzzleHttpSignatures::middlewareFromContext($this->context));
+        $stack->push(Middleware::history($this->history));
+        $this->client = new Client(['handler' => $stack]);
     }
 
     /**
@@ -49,29 +51,35 @@ class GuzzleHttpSignerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGuzzleRequestHasExpectedHeaders()
     {
-        $this->client->get('/path?query=123', array(
-            'headers' => array('date' => 'today', 'accept' => 'llamas')
-        ));
-        $message = $this->history->getLastRequest();
+        $this->client->get('/path?query=123', [
+            'headers' => ['date' => 'today', 'accept' => 'llamas']
+        ]);
+
+        // get last request
+        $message = end($this->history);
+        /** @var Request $request */
+        $request = $message['request'];
+        /** @var Response $response */
+        $response = $message['request'];
 
         $expectedString = implode(
             ',',
-            array(
+            [
                 'keyId="pda"',
                 'algorithm="hmac-sha256"',
                 'headers="(request-target) date"',
                 'signature="SFlytCGpsqb/9qYaKCQklGDvwgmrwfIERFnwt+yqPJw="',
-            )
+            ]
         );
 
         $this->assertEquals(
-            $expectedString,
-            (string) $message->getHeader('Signature')
+            [$expectedString],
+            $request->getHeader('Signature')
         );
 
         $this->assertEquals(
-            'Signature ' . $expectedString,
-            (string) $message->getHeader('Authorization')
+            ['Signature ' . $expectedString],
+            $request->getHeader('Authorization')
         );
     }
 
@@ -80,39 +88,62 @@ class GuzzleHttpSignerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGuzzleRequestHasExpectedHeaders2()
     {
-        $this->client->get('/path', array(
-            'headers' => array('date' => 'today', 'accept' => 'llamas')
-        ));
-        $message = $this->history->getLastRequest();
+        $this->client->get('/path', [
+            'headers' => ['date' => 'today', 'accept' => 'llamas']
+        ]);
+
+        // get last request
+        $message = end($this->history);
+        /** @var Request $request */
+        $request = $message['request'];
+        /** @var Response $response */
+        $response = $message['request'];
 
         $expectedString = implode(
             ',',
-            array(
+            [
                 'keyId="pda"',
                 'algorithm="hmac-sha256"',
                 'headers="(request-target) date"',
                 'signature="DAtF133khP05pS5Gh8f+zF/UF7mVUojMj7iJZO3Xk4o="',
-            )
+            ]
         );
 
         $this->assertEquals(
-            $expectedString,
-            (string) $message->getHeader('Signature')
+            [$expectedString],
+            $request->getHeader('Signature')
         );
 
         $this->assertEquals(
-            'Signature ' . $expectedString,
-            (string) $message->getHeader('Authorization')
+            ['Signature ' . $expectedString],
+            $request->getHeader('Authorization')
         );
     }
 
-    public function testVerifyGuzzleRequest()
-    {
-        $this->client->get('/path?query=123', array(
-            'headers' => array('date' => 'today', 'accept' => 'llamas')
-        ));
-        $message = $this->history->getLastRequest();
+    public function getVerifyGuzzleRequestVectors() {
+        return [
+            /* path, headers */
+            ['/path?query=123', ['date' => 'today', 'accept' => 'llamas']],
+            ['/path?z=zebra&a=antelope', ['date' => 'today']],
+        ];
+    }
 
-        $this->assertTrue($this->context->verifier()->isValid(new Message($message)));
+    /**
+     * @dataProvider getVerifyGuzzleRequestVectors
+     * @param string $path
+     * @param array $headers
+     */
+    public function testVerifyGuzzleRequest($path, $headers)
+    {
+        $this->client->get($path, ['headers' => $headers]);
+
+        // get last request
+        $message = end($this->history);
+        /** @var Request $request */
+        $request = $message['request'];
+        /** @var Response $response */
+        $response = $message['request'];
+
+        $this->assertTrue($this->context->verifier()->isValid($request));
     }
 }

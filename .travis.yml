@@ -4,6 +4,8 @@ php:
   - 5.6
   - 5.5
   - 5.4
+  - 7.0
+  - 7.1
   - hhvm
 
 install: composer require --no-update guzzlehttp/guzzle $GUZZLE_VERSION; composer update
@@ -14,3 +16,16 @@ env:
   - GUZZLE_VERSION: 4.2
   - GUZZLE_VERSION: 5.0
   - GUZZLE_VERSION: 5.2
+  - GUZZLE_VERSION: 5.3
+  - GUZZLE_VERSION: 5.3.1
+
+matrix:
+  exclude:
+    - php: 7.1
+      env: GUZZLE_VERSION=4.2
+    - php: 7.1
+      env: GUZZLE_VERSION=5.0
+    - php: 7.1
+      env: GUZZLE_VERSION=5.2
+    - php: 7.1
+      env: GUZZLE_VERSION=5.3

@@ -79,3 +79,8 @@ Pull Requests are welcome.
 
 [99signatures]: https://github.com/99designs/http-signatures-php
 [99signatures-guzzle]: https://github.com/99designs/http-signatures-guzzle
+
+
+## License
+
+HTTP Signatures is licensed under [The MIT License (MIT)](LICENSE).

@@ -64,7 +64,7 @@ $context = new Context([
 
 $handlerStack = new HandlerStack();
 $stack->setHandler(new CurlHandler());
-$stack->push(GuzzleHttpSignatures::middlewareFromContext($this->context));
+$stack->push(GuzzleHttpSignatures::middlewareFromContext($context));
 $stack->push(Middleware::history($this->history));
 $client = new Client(['handler' => $handlerStack]);
 

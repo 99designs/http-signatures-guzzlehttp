@@ -11,8 +11,9 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use HttpSignatures\Context;
 use HttpSignatures\GuzzleHttpSignatures;
+use PHPUnit\Framework\TestCase;
 
-class GuzzleHttpSignerTest extends \PHPUnit_Framework_TestCase
+class GuzzleHttpSignerTest extends TestCase
 {
     /**
      * @var Context
@@ -29,7 +30,7 @@ class GuzzleHttpSignerTest extends \PHPUnit_Framework_TestCase
      */
     private $history = [];
 
-    public function setUp()
+    public function setUp() : void
     {
         $this->context = new Context([
             'keys' => ['pda' => 'secret'],

@@ -14,14 +14,21 @@
             "email": "ruben@rubensayshi.com"
         }
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/deepsidhu1313/http-signatures-php.git"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "": "src/"
         }
     },
+    "minimum-stability": "beta",
     "require": {
         "php": ">=8.1",
-        "99designs/http-signatures": ">=3.0.0 <5.0.0",
+        "99designs/http-signatures": "^5",
         "guzzlehttp/guzzle": ">=7.0"
     },
     "require-dev": {
